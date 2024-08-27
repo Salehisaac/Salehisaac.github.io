@@ -1,6 +1,5 @@
 <html ng-app="custom-webapp-ui" lang="en" style="background-color: white">
   <head>
-    <h1>Hello there</h1>
     <!-- Load the Telegram Library -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!--Load the AngularJS Library-->
@@ -22,6 +21,7 @@
         mainButton.show();
         // and make it send the "foods" object (as JSON string) back to the bot
         mainButton.onClick(function(){
+            alert(JSON.stringify($scope.foods[0]))
           window.Telegram.WebApp.sendData(JSON.stringify($scope.foods));
         })
       });
