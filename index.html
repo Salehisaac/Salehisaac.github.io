@@ -7,27 +7,30 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script>
 
-      angular.module("custom-webapp-ui", []).controller('CustomUIController', function CustomUIController($scope) {
-        console.log(window.Telegram.WebApp);
+     angular.module("custom-webapp-ui", []).controller('CustomUIController', function CustomUIController($scope) {
+    console.log(window.Telegram.WebApp);
 
-        
-        $scope.foods = [
-                { name: "fruits", value: 5 },
-                { name: "vegetables", value: 5 },
-                { name: "meat", value: 5 },
-                { name: "dairy", value: 5 }
-            ];
-        
-        const mainButton = window.Telegram.WebApp.MainButton;
-        mainButton.text = "Save Preferences";
-        mainButton.enable();
-        mainButton.show();
-       
-        mainButton.onClick(function(){
-          alert("hi")
-          window.Telegram.WebApp.setBackgroundColor("red");
-        })
-      });
+    $scope.foods = [
+        { name: "fruits", value: 5 },
+        { name: "vegetables", value: 5 },
+        { name: "meat", value: 5 },
+        { name: "dairy", value: 5 }
+    ];
+
+    const mainButton = window.Telegram.WebApp.MainButton;
+    mainButton.text = "Save Preferences";
+    mainButton.enable();
+    mainButton.show();
+
+    mainButton.onClick(function() {
+        alert("hi");
+        try {
+            window.Telegram.WebApp.setBackgroundColor("red");
+        } catch (error) {
+            console.error("Error setting background color:", error);
+        }
+    });
+});
     </script>
   </head>
   <body ng-controller="CustomUIController">
