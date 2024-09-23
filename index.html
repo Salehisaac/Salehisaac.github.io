@@ -2,7 +2,6 @@
   <head>
    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <h1>hi</h1>
    
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script>
@@ -22,14 +21,10 @@
     mainButton.enable();
     mainButton.show();
 
-    mainButton.onClick(function() {
-        alert("hi");
-        try {
-            window.Telegram.WebApp.setBackgroundColor("red");
-        } catch (error) {
-            console.error("Error setting background color:", error);
-        }
-    });
+  mainButton.onClick(function() {
+      const preferences = JSON.stringify($scope.foods);  
+      window.Telegram.WebApp.sendData(preferences);      
+  });
 });
     </script>
   </head>
