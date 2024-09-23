@@ -1,73 +1,50 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"log"
+	"os"
+	"time"
 	"fmt"
-	"net/http"
+
+	tele "gopkg.in/telebot.v3"
+	"github.com/subosito/gotenv"
 )
 
-const botToken = "7439590358:AAFN5dC58gT_2UXlcePTkLrSWmdmVNF4wUc"
-const chatID = "291109889"
-
-type WebAppInfo struct {
-	URL string `json:"url"`
-}
-
-type InlineKeyboardButton struct {
-	Text   string     `json:"text"`
-	WebApp *WebAppInfo `json:"web_app"`
-}
-
-type InlineKeyboardMarkup struct {
-	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
-}
-
-type SendMessageRequest struct {
-	ChatID      string               `json:"chat_id"`
-	Text        string               `json:"text"`
-	ReplyMarkup InlineKeyboardMarkup `json:"reply_markup"`
-}
-
-func sendWebAppButton() error {
-	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", botToken)
-
-	webApp := WebAppInfo{URL: "https://calixtemayoraz.gitlab.io/web-interfacer-bot/"}
-	button := InlineKeyboardButton{
-		Text:   "Open Web App",
-		WebApp: &webApp,
-	}
-	keyboard := InlineKeyboardMarkup{
-		InlineKeyboard: [][]InlineKeyboardButton{{button}},
-	}
-	requestBody := SendMessageRequest{
-		ChatID:      chatID,
-		Text:        "Click the button to open the Web App",
-		ReplyMarkup: keyboard,
-	}
-
-	body, err := json.Marshal(requestBody)
-	if err != nil {
-		return err
-	}
-
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to send message: %s", resp.Status)
-	}
-
-	return nil
+func init(){
+	gotenv.Load()
 }
 
 func main() {
-	if err := sendWebAppButton(); err != nil {
-		fmt.Printf("Error: %v\n", err)
-	} else {
-		fmt.Println("Web app button sent successfully.")
+
+	pref := tele.Settings{
+		Token:  os.Getenv("TOKEN"),
+		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
+
+	b, err := tele.NewBot(pref)
+	if err != nil {
+		log.Fatalf("error creating bot %v", err)
+		return
+	}
+
+	webApp := &tele.WebApp{
+		URL: "https://salehisaac.github.io/webapp/",
+	}
+	
+	b.Handle("/start", func(c tele.Context) error {
+		markup := b.NewMarkup()
+		markup.Inline(markup.Row(markup.WebApp("Open", webApp)))
+		return c.Send("Open this app!", markup)
+	})
+	
+	b.Handle(tele.OnWebApp, func(c tele.Context) error {
+		webapp := c.Message().WebAppData
+		fmt.Println(webapp.Data)
+		c.Send("Preferences received: " + webapp.Data)
+		return nil
+	})
+
+	log.Println("listening...")
+	b.Start()
+	
 }
